@@ -42,10 +42,10 @@ export function EnterIncome({ setIncome }: EnterIncomeProps) {
             </CardHeader>
             <div className="space-y-4">
                 <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
                     <Input
                         type="number"
-                        placeholder="5000"
+                        placeholder="50000"
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleContinue()}

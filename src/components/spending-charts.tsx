@@ -39,7 +39,7 @@ export function SpendingCharts({ expenses }: SpendingChartsProps) {
     <div className="h-[400px]">
       <ChartContainer config={chartConfig} className="h-full w-full">
         <ResponsiveContainer>
-          <LineChart data={lineChartData} accessibilityLayer margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <LineChart data={lineChartData} accessibilityLayer margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
             <XAxis 
               dataKey="date" 
@@ -51,12 +51,17 @@ export function SpendingCharts({ expenses }: SpendingChartsProps) {
             <YAxis 
               tickLine={false} 
               axisLine={false} 
-              tickFormatter={(value) => `$${value}`}
+              tickFormatter={(value) => `₹${value}`}
               width={50}
             />
             <Tooltip
               cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
-              content={<ChartTooltipContent indicator="dot" />}
+              content={<ChartTooltipContent indicator="dot" formatter={(value, name) => {
+                if (name === 'amount') {
+                  return [`₹${(value as number).toLocaleString('en-IN')}`, 'Amount']
+                }
+                return [value, name];
+              }} />}
             />
             <Line 
               dataKey="amount" 

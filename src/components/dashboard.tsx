@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { PlusCircle, Settings } from 'lucide-react';
+import { PlusCircle, Settings, LogOut } from 'lucide-react';
 import type { Budget, Expense } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { BudgetSettingsDialog } from './budget-settings-dialog';
 import { SpendingCharts } from './spending-charts';
 import GenerativeInsights from './generative-insights';
 import placeholderImages from '@/lib/placeholder-images.json';
+import { useAuth } from '@/hooks/use-auth';
 
 interface DashboardProps {
     expenses: Expense[];
@@ -34,6 +35,7 @@ export function Dashboard({ expenses, budgets, income, addExpense, setBudgets, s
   const [isAddExpenseOpen, setAddExpenseOpen] = useState(false);
   const [isBudgetSettingsOpen, setBudgetSettingsOpen] = useState(false);
   const [dailyQuote, setDailyQuote] = useState('');
+  const { logout } = useAuth();
 
   const totalSpending = useMemo(() => expenses.reduce((sum, expense) => sum + expense.amount, 0), [expenses]);
   const balance = useMemo(() => income - totalSpending, [income, totalSpending]);
@@ -59,6 +61,9 @@ export function Dashboard({ expenses, budgets, income, addExpense, setBudgets, s
                 </Button>
                 <Button variant="outline" size="icon" onClick={() => setBudgetSettingsOpen(true)}>
                     <Settings className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={logout}>
+                    <LogOut className="h-4 w-4" />
                 </Button>
             </div>
         </div>
@@ -87,8 +92,8 @@ export function Dashboard({ expenses, budgets, income, addExpense, setBudgets, s
               <CardTitle className="text-sm font-medium text-muted-foreground">Balance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold">${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-              <p className="text-xs text-muted-foreground">${income.toLocaleString('en-US')} - ${totalSpending.toLocaleString('en-US')}</p>
+              <div className="text-4xl font-bold">₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <p className="text-xs text-muted-foreground">₹{income.toLocaleString('en-IN')} - ₹{totalSpending.toLocaleString('en-IN')}</p>
             </CardContent>
           </Card>
           <Card className="md:col-span-1">
@@ -96,7 +101,7 @@ export function Dashboard({ expenses, budgets, income, addExpense, setBudgets, s
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Spending</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold">${totalSpending.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <div className="text-4xl font-bold">₹{totalSpending.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
               <p className="text-xs text-muted-foreground">across {expenses.length} transactions</p>
             </CardContent>
           </Card>
