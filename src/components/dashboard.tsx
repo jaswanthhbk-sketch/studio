@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { DollarSign, PlusCircle, Settings, Sparkles } from 'lucide-react';
+import { PlusCircle, Settings } from 'lucide-react';
 import type { Budget, Expense } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,13 +33,14 @@ const quotes = [
 export function Dashboard({ expenses, budgets, income, addExpense, setBudgets, setIncome }: DashboardProps) {
   const [isAddExpenseOpen, setAddExpenseOpen] = useState(false);
   const [isBudgetSettingsOpen, setBudgetSettingsOpen] = useState(false);
+  const [dailyQuote, setDailyQuote] = useState('');
 
   const totalSpending = useMemo(() => expenses.reduce((sum, expense) => sum + expense.amount, 0), [expenses]);
   const balance = useMemo(() => income - totalSpending, [income, totalSpending]);
   
-  const dailyQuote = useMemo(() => {
+  useEffect(() => {
     const dayOfYear = Math.floor((new Date().getTime() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
-    return quotes[dayOfYear % quotes.length];
+    setDailyQuote(quotes[dayOfYear % quotes.length]);
   }, []);
 
   const saveSettings = (newBudgets: Budget, newIncome: number) => {
@@ -51,7 +52,7 @@ export function Dashboard({ expenses, budgets, income, addExpense, setBudgets, s
     <div className="flex flex-col gap-8 min-h-screen">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-            <h1 className="text-2xl font-bold font-headline">Kakeibo</h1>
+            <h1 className="text-2xl font-bold font-headline">SpendWise</h1>
             <div className="flex items-center gap-2">
                  <Button onClick={() => setAddExpenseOpen(true)}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
@@ -115,7 +116,7 @@ export function Dashboard({ expenses, budgets, income, addExpense, setBudgets, s
         </Card>
 
         <footer className="text-center text-muted-foreground italic py-6">
-            <p>&quot;{dailyQuote}&quot;</p>
+            {dailyQuote && <p>&quot;{dailyQuote}&quot;</p>}
         </footer>
       </main>
       
