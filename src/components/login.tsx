@@ -20,6 +20,14 @@ export default function Login() {
   const { toast } = useToast();
 
   const handleSubmit = async () => {
+    if (!email || !password) {
+      toast({
+        variant: 'destructive',
+        title: 'Missing Fields',
+        description: 'Please enter both email and password.',
+      });
+      return;
+    }
     setLoading(true);
     try {
       if (isLogin) {
@@ -67,6 +75,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="h-12 text-lg"
+              disabled={loading}
             />
             <Input
               type="password"
@@ -75,11 +84,12 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               className="h-12 text-lg"
+              disabled={loading}
             />
             <Button onClick={handleSubmit} className="w-full h-12 text-md" size="lg" loading={loading}>
-              {isLogin ? 'Log In' : 'Sign Up'}
+              {loading ? (isLogin ? 'Logging In...' : 'Signing Up...') : (isLogin ? 'Log In' : 'Sign Up')}
             </Button>
-            <Button variant="link" onClick={() => setIsLogin(!isLogin)} className="w-full">
+            <Button variant="link" onClick={() => setIsLogin(!isLogin)} className="w-full" disabled={loading}>
               {isLogin ? 'Need an account? Sign up' : 'Already have an account? Log in'}
             </Button>
           </div>
