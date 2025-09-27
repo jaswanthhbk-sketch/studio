@@ -1,97 +1,84 @@
 'use client';
 
-import { Bar, BarChart, CartesianGrid, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, Legend } from 'recharts';
+import { Line, LineChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useMemo } from 'react';
-import type { Budget, Expense } from '@/lib/types';
-import { Categories } from '@/lib/types';
+import { format } from 'date-fns';
+import type { Expense } from '@/lib/types';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 
 const chartConfig = {
-  spending: {
-    label: 'Spending',
-    color: 'hsl(var(--primary))',
-  },
-  budget: {
-    label: 'Budget',
-    color: 'hsl(var(--accent))',
+  amount: {
+    label: 'Amount',
+    color: 'hsl(var(--chart-1))',
   },
 } satisfies ChartConfig;
 
-const pieColors = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
-  'hsl(22, 80%, 55%)',
-  'hsl(280, 65%, 60%)',
-  'hsl(340, 75%, 55%)',
-  'hsl(160, 60%, 45%)',
-  'hsl(30, 80%, 55%)',
-  'hsl(220, 70%, 50%)',
-  'hsl(200, 75%, 55%)',
-  'hsl(180, 65%, 60%)',
-];
-
-
 interface SpendingChartsProps {
   expenses: Expense[];
-  budgets: Budget;
 }
 
-export function SpendingCharts({ expenses, budgets }: SpendingChartsProps) {
-  const { barChartData, pieChartData } = useMemo(() => {
-    const spendingByCategory = new Map<string, number>();
-    for (const expense of expenses) {
-      spendingByCategory.set(expense.category, (spendingByCategory.get(expense.category) || 0) + expense.amount);
+export function SpendingCharts({ expenses }: SpendingChartsProps) {
+  const lineChartData = useMemo(() => {
+    const dataByDay: { [key: string]: number } = {};
+    const last30Days = new Date();
+    last30Days.setDate(last30Days.getDate() - 30);
+
+    const filteredExpenses = expenses.filter(e => new Date(e.date) >= last30Days);
+
+    for (const expense of filteredExpenses) {
+      const day = format(new Date(expense.date), 'yyyy-MM-dd');
+      dataByDay[day] = (dataByDay[day] || 0) + expense.amount;
     }
-
-    const barData = Categories.map(category => ({
-      name: category,
-      spending: spendingByCategory.get(category) || 0,
-      budget: budgets[category] || 0,
-    })).filter(d => d.spending > 0 || d.budget > 0);
-
-    const pieData = Array.from(spendingByCategory.entries())
-      .map(([name, value]) => ({ name, value }))
-      .filter(d => d.value > 0);
-
-    return { barChartData: barData, pieChartData: pieData };
-  }, [expenses, budgets]);
+    
+    return Object.entries(dataByDay)
+      .map(([date, amount]) => ({ date, amount }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [expenses]);
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[400px]">
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Category Breakdown</h3>
-        <ChartContainer config={chartConfig} className="h-[350px] w-full">
-          <ResponsiveContainer>
-            <BarChart data={barChartData} accessibilityLayer>
-              <CartesianGrid vertical={false} />
-              <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} angle={-45} textAnchor="end" height={70} />
-              <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-              <Tooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-              <Legend />
-              <Bar dataKey="spending" fill="var(--color-spending)" radius={4} />
-              <Bar dataKey="budget" fill="var(--color-budget)" radius={4} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Spending Distribution</h3>
-        <ChartContainer config={{}} className="h-[350px] w-full">
-          <ResponsiveContainer>
-            <PieChart>
-              <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
-              <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false}>
-                {pieChartData.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </div>
+    <div className="h-[400px]">
+      <ChartContainer config={chartConfig} className="h-full w-full">
+        <ResponsiveContainer>
+          <LineChart data={lineChartData} accessibilityLayer margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
+            <XAxis 
+              dataKey="date" 
+              tickLine={false} 
+              axisLine={false}
+              tickMargin={10} 
+              tickFormatter={(value) => format(new Date(value), 'MMM d')}
+            />
+            <YAxis 
+              tickLine={false} 
+              axisLine={false} 
+              tickFormatter={(value) => `$${value}`}
+              width={50}
+            />
+            <Tooltip
+              cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
+              content={<ChartTooltipContent indicator="dot" />}
+            />
+            <Line 
+              dataKey="amount" 
+              type="monotone" 
+              stroke="hsl(var(--primary))" 
+              strokeWidth={2}
+              dot={{
+                r: 4,
+                fill: 'hsl(var(--primary))',
+                stroke: 'hsl(var(--background))',
+                strokeWidth: 2,
+              }}
+              activeDot={{
+                r: 6,
+                fill: 'hsl(var(--primary))',
+                stroke: 'hsl(var(--background))',
+                strokeWidth: 2,
+              }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartContainer>
     </div>
   );
 }

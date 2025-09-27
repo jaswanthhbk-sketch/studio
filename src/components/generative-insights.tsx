@@ -46,24 +46,23 @@ export default function GenerativeInsights({ expenses, budgets, income }: Genera
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="text-primary" />
-          AI-Powered Insights
+          AI Insights
         </CardTitle>
-        <CardDescription>Get personalized tips to improve your spending habits.</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col items-center justify-center text-center">
         {isLoading ? (
           <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <p className="text-muted-foreground">Analyzing your data...</p>
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground text-sm">Analyzing your data...</p>
           </div>
         ) : insights ? (
-          <div className="text-sm text-left whitespace-pre-wrap font-sans bg-muted/50 p-4 rounded-lg w-full flex-grow overflow-auto">
+          <div className="text-sm text-left whitespace-pre-wrap font-sans bg-background/50 p-4 rounded-lg w-full flex-grow overflow-auto">
             {insights}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-muted-foreground max-w-xs">Click the button to generate personalized financial advice based on your spending.</p>
-            <Button onClick={handleGenerateInsights} disabled={isLoading}>
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-muted-foreground text-sm">Generate financial advice based on your spending.</p>
+            <Button onClick={handleGenerateInsights} disabled={isLoading} size="sm">
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
               Generate Insights
             </Button>
