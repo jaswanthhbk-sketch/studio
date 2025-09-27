@@ -30,7 +30,7 @@ const formSchema = z.object({
 interface AddExpenseDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onAddExpense: (expense: Expense) => void;
+  onAddExpense: (expense: Omit<Expense, 'id'>) => void;
 }
 
 export function AddExpenseDialog({ isOpen, setIsOpen, onAddExpense }: AddExpenseDialogProps) {
@@ -72,11 +72,7 @@ export function AddExpenseDialog({ isOpen, setIsOpen, onAddExpense }: AddExpense
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const newExpense: Expense = {
-      id: crypto.randomUUID(),
-      ...values,
-    };
-    onAddExpense(newExpense);
+    onAddExpense(values);
     form.reset();
     setIsOpen(false);
     toast({

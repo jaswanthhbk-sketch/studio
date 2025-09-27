@@ -17,9 +17,9 @@ interface DashboardProps {
     expenses: Expense[];
     budgets: Budget;
     income: number;
-    addExpense: (expense: Expense) => void;
+    addExpense: (expense: Omit<Expense, 'id'>) => void;
     setBudgets: (budgets: Budget) => void;
-    setIncome: (income: number) => void;
+    setIncome: (budgets: Budget, income: number) => void;
 }
 
 const quotes = [
@@ -46,8 +46,7 @@ export function Dashboard({ expenses, budgets, income, addExpense, setBudgets, s
   }, []);
 
   const saveSettings = (newBudgets: Budget, newIncome: number) => {
-    setBudgets(newBudgets);
-    setIncome(newIncome);
+    setIncome(newBudgets, newIncome);
   };
 
   return (

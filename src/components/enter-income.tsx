@@ -37,8 +37,8 @@ export function EnterIncome({ setIncome }: EnterIncomeProps) {
         </div>
         <div className="bg-card text-card-foreground p-8 md:p-12 flex flex-col justify-center">
             <CardHeader className="p-0 mb-6">
-              <h1 className="text-3xl font-bold font-headline mb-2">Welcome</h1>
-              <p className="text-muted-foreground">Let's start by setting your monthly income.</p>
+              <h1 className="text-3xl font-bold font-headline mb-2">Set Your Monthly Income</h1>
+              <p className="text-muted-foreground">We'll ask for this once a month to keep your budget fresh.</p>
             </CardHeader>
             <div className="space-y-4">
                 <div className="relative">
